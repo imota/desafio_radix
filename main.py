@@ -17,17 +17,10 @@ def get_temps_of_line(i, data):
 def get_target(i):
 	return data_train['target'][i]
 
-def parse_train():
-	X = []
-	y = []
-	for i in range(5209):
-		X.append(get_temps_of_line(i, data_train))
-		y.append(get_target(i))	
-	return X, y	
-
 if __name__ == "__main__":
 	data_train = pd.read_csv('p1_data_train.csv')
-	X, y = parse_train()
+	X = [get_temps_of_line(i, data_train) for i in range(5209)]
+	y = [get_target(i) for i in range(5209)]
 	X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.5, random_state=1)
 	
 	clf = LogisticRegression(class_weight = 'balanced', solver = 'lbfgs')
@@ -41,4 +34,4 @@ if __name__ == "__main__":
 	data_test = pd.read_csv('p1_data_test.csv')
 	X = [get_temps_of_line(i, data_test) for i in range(5208)]
 	p1_predictions = clf.predict(X)
-	print (p1_predictions)
+	#print (p1_predictions)
