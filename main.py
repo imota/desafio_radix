@@ -34,4 +34,6 @@ if __name__ == "__main__":
 	data_test = pd.read_csv('p1_data_test.csv')
 	X = [get_temps_of_line(i, data_test) for i in range(5208)]
 	p1_predictions = clf.predict(X)
-	#print (p1_predictions)
+	
+	df = pd.DataFrame(p1_predictions, columns = ['target'])
+	df.to_csv('p1_predictions.csv', index = False)
