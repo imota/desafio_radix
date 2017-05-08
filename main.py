@@ -1,14 +1,17 @@
 import pandas as pd
 import numpy as np 
 import matplotlib.pyplot as plt
-from sklearn.neural_network import MLPClassifier
 
-def get_temps_of_line(i):
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report,confusion_matrix
+
+def get_temps_of_line(i, data):
 	X = np.ndarray(4)
-	X[0] = data_train['Temp1'][i]
-	X[1] = data_train['Temp2'][i]
-	X[2] = data_train['Temp3'][i]
-	X[3] = data_train['Temp4'][i]
+	X[0] = data['Temp1'][i]
+	X[1] = data['Temp2'][i]
+	X[2] = data['Temp3'][i]
+	X[3] = data['Temp4'][i]
 	return X
 
 def get_target(i):
@@ -18,19 +21,24 @@ def parse_train():
 	X = []
 	y = []
 	for i in range(5209):
-		X.append(get_temps_of_line(i))
+		X.append(get_temps_of_line(i, data_train))
 		y.append(get_target(i))	
-	return X, y
+	return X, y	
 
-data_train = pd.read_csv('p1_data_train.csv')
-X, y = parse_train()
+if __name__ == "__main__":
+	data_train = pd.read_csv('p1_data_train.csv')
+	X, y = parse_train()
+	X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.5, random_state=1)
+	
+	clf = LogisticRegression(class_weight = 'balanced', solver = 'lbfgs')
+	clf.fit(X_train, y_train)
+	
+	test_predictions = clf.predict(X_test)
+	print(confusion_matrix(y_test,test_predictions))
+	print(classification_report(y_test,test_predictions))
+	print(clf.coef_)
 
-clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
-clf.fit(X,y)
-
-results = clf.predict(X)
-error = 0.
-for i in range(5209):
-	if results[i] != y[i]:
-		error = error+1
-print(error*100/5209)
+	data_test = pd.read_csv('p1_data_test.csv')
+	X = [get_temps_of_line(i, data_test) for i in range(5208)]
+	p1_predictions = clf.predict(X)
+	print (p1_predictions)
